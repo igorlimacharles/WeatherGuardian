@@ -21,7 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,7 +54,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(
                         painter = painterResource(R.drawable.cloud),
-                        contentDescription = "Weather Icon", Modifier.size(256.dp).padding(25.dp)
+                        contentDescription = "Weather Icon", Modifier
+                            .size(256.dp)
+                            .padding(25.dp)
 
                     )
 
@@ -80,15 +85,23 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
                         )
 
-                    Row(verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(5.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(5.dp)
+                    ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                            Row {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(10.dp)
+                            ) {
 
                                 Image(
                                     painter = painterResource(R.drawable.windy),
-                                    contentDescription = "Umidity Icon", Modifier.size(32.dp).padding(5.dp),
+                                    contentDescription = "Windy Icon",
+                                    Modifier
+                                        .size(32.dp)
+                                        .padding(5.dp),
                                     colorFilter = ColorFilter.tint(Color.White)
 
                                 )
@@ -105,21 +118,26 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
                             Text(
                                 text = "24 km/h",
-                                fontSize = 32.sp,
+                                fontSize = 16.sp,
                                 color = Color.White,
                                 modifier = Modifier.padding(0.dp),
 
                                 )
 
                         }
-
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                            Row {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(10.dp)
+                            ) {
 
                                 Image(
                                     painter = painterResource(R.drawable.umidity),
-                                    contentDescription = "Umidity Icon", Modifier.size(32.dp).padding(5.dp),
+                                    contentDescription = "Umidity Icon",
+                                    Modifier
+                                        .size(32.dp)
+                                        .padding(5.dp),
                                     colorFilter = ColorFilter.tint(Color.White)
 
                                 )
@@ -136,20 +154,21 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
                             Text(
                                 text = "87%",
-                                fontSize = 32.sp,
+                                fontSize = 16.sp,
                                 color = Color.White,
                                 modifier = Modifier.padding(0.dp),
 
                                 )
 
                         }
+
                     }
 
                 }
 
             }
 
-            Column (verticalArrangement = Arrangement.SpaceEvenly) {
+            Column(verticalArrangement = Arrangement.SpaceEvenly) {
                 Card(modifier = Modifier.padding(20.dp)) {
                     Text(
                         text = "Predomínio de chuva na parte da tarde",
@@ -174,113 +193,81 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         .fillMaxHeight()
                         .padding(20.dp),
                     shape = RoundedCornerShape(
-                        topStart = 32.dp,
-                        topEnd = 32.dp,
+                        32.dp
                     )
 
                 ) {
 
-                    Column(verticalArrangement = Arrangement.SpaceAround) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(8.dp)
+                    ) {
 
-                        Row(verticalAlignment = Alignment.CenterVertically) {
 
-                            Text(
-                                modifier = Modifier.padding(20.dp),
-                                text = "Hoje",
-                                fontSize = 32.sp,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
-                            )
-
+                        Column(horizontalAlignment = Alignment.Start) {
+                            WeatherText("Hoje")
+                            WeatherText("Amanhã")
+                            WeatherText("Hoje")
+                            WeatherText("Hoje")
+                            WeatherText("Hoje")
+                        }
+                        Column(horizontalAlignment = Alignment.Start) {
                             Image(
                                 painter = painterResource(R.drawable.cloud),
                                 contentDescription = "Rain Icon",
-                                Modifier.size(64.dp)
+                                Modifier
+                                    .size(64.dp)
+                                    .padding(8.dp)
                             )
-
-                            Text(
-                                modifier = Modifier.padding(20.dp),
-                                text = "32ºC",
-                                fontSize = 32.sp,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold
+                            Image(
+                                painter = painterResource(R.drawable.cloud),
+                                contentDescription = "Rain Icon",
+                                Modifier
+                                    .size(64.dp)
+                                    .padding(start = 8.dp, end = 8.dp)
                             )
-
-                            Text(
-                                modifier = Modifier.padding(20.dp),
-                                text = "29ºC",
-                                fontSize = 32.sp,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
+                            Image(
+                                painter = painterResource(R.drawable.cloud),
+                                contentDescription = "Rain Icon",
+                                Modifier
+                                    .size(64.dp)
+                                    .padding(start = 8.dp, end = 8.dp)
+                            )
+                            Image(
+                                painter = painterResource(R.drawable.cloud),
+                                contentDescription = "Rain Icon",
+                                Modifier
+                                    .size(64.dp)
+                                    .padding(start = 8.dp, end = 8.dp)
+                            )
+                            Image(
+                                painter = painterResource(R.drawable.cloud),
+                                contentDescription = "Rain Icon",
+                                Modifier
+                                    .size(64.dp)
+                                    .padding(start = 8.dp, end = 8.dp)
                             )
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            WeatherText("32ºC")
+                            WeatherText("32ºC")
+                            WeatherText("32ºC")
+                            WeatherText("32ºC")
+                            WeatherText("32ºC")
 
-                            Text(
-                                modifier = Modifier.padding(20.dp),
-                                text = "Amanhã",
-                                fontSize = 32.sp,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
-                            )
-
-                            Image(
-                                painter = painterResource(R.drawable.cloud),
-                                contentDescription = "Rain Icon",
-                                Modifier.size(64.dp)
-                            )
-
-                            Text(
-                                modifier = Modifier.padding(20.dp),
-                                text = "32ºC",
-                                fontSize = 32.sp,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                modifier = Modifier.padding(20.dp),
-                                text = "29ºC",
-                                fontSize = 32.sp,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
-                            )
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                            Text(
-                                modifier = Modifier.padding(20.dp),
-                                text = "Sábado",
-                                fontSize = 32.sp,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
-                            )
-
-                            Image(
-                                painter = painterResource(R.drawable.cloud),
-                                contentDescription = "Rain Icon",
-                                Modifier.size(64.dp)
-                            )
-
-                            Text(
-                                modifier = Modifier.padding(20.dp),
-                                text = "32ºC",
-                                fontSize = 32.sp,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                modifier = Modifier.padding(20.dp),
-                                text = "29ºC",
-                                fontSize = 32.sp,
-                                color = Color.Black,
-                                fontWeight = FontWeight.Bold,
-                            )
+                            WeatherText("29ºC")
+                            WeatherText("29ºC")
+                            WeatherText("29ºC")
+                            WeatherText("29ºC")
+                            WeatherText("29ºC")
                         }
 
 
                     }
+
                 }
 
             }
@@ -290,6 +277,18 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     }
 
 }
+
+@Composable
+fun WeatherText(text: String) {
+    Text(
+        modifier = Modifier.padding(15.dp),
+        text = text,
+        fontSize = 24.sp,
+        color = Color.Black,
+        fontWeight = FontWeight.Bold
+    )
+}
+
 
 @Preview(showSystemUi = true)
 @Composable
