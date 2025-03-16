@@ -11,6 +11,7 @@ composeBom = "2024.04.01"
 retrofit = "2.9.0"
 okhttp = "4.9.0"
 gson = "2.8.8"
+lifecycle = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,6 +32,8 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+androidx_lifecycle_viewmodel_compose = "androidx.lifecycle:lifecycle-viewmodel-compose:${versions.lifecycle}"
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
