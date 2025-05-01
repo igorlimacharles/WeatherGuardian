@@ -1,257 +1,76 @@
 package com.example.weatherguardian.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.weatherguardian.R
-import com.example.weatherguardian.network.ApiClient
-import com.example.weatherguardian.network.WeatherResponse
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+
+object AppColors {
+    val primary = Color(0xFF2196F3) // Azul Principal
+    val secondary = Color(0xFF03A9F4) // Azul Secundário
+    val accent = Color(0xFFFFC107) // Amarelo (para detalhes)
+    val textColorPrimary = Color.White
+    val textColorSecondary = Color.Black
+    val cardBackgroundLight = Color.LightGray
+    val dayBackgroundColor = Color(0xFF87CEEB) // Light Blue
+    val nightBackgroundColor = Color(0xFF191970) // Midnight Blue
+    val errorColor = Color(0xFFB00020) // Vermelho para erros
+}
 
 @Composable
-fun HomeScreen() {
-    // Variáveis de estado
-    var weatherData by remember { mutableStateOf<WeatherResponse?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
 
-    val city = "São Paulo"
-    val apiKey = "74ef25b903a24f73ccb7fc9a814ccd2a"
-
-    // Lançando a chamada da API
-    LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) {
-            ApiClient.weatherService.getWeather(city, apiKey).enqueue(object : Callback<WeatherResponse> {
-                override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
-                    if (response.isSuccessful) {
-                        weatherData = response.body()
-                        Log.d("API Success", "Dados do clima recebidos com sucesso")
-                    } else {
-                        errorMessage = "Erro na resposta: ${response.code()}"
-                        Log.e("API Error", "Erro na resposta: ${response.errorBody()}")
-                    }
-                    isLoading = false
-                }
-
-                override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
-                    isLoading = false
-                    errorMessage = "Falha na requisição: ${t.message}"
-                    Log.e("API Error", "Erro na requisição: ${t.message}", t)
-                }
-            })
-        }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.Blue)
-            .verticalScroll(rememberScrollState()),
-        contentAlignment = Alignment.TopEnd
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = AppColors.primary // Cor de fundo principal
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp) // Espaçamento uniforme
         ) {
-            if (isLoading) {
-                // Exibe uma mensagem de carregamento enquanto a API responde
-                Text("Carregando...", fontSize = 24.sp, color = Color.White)
-            } else {
-                // Exibe erro se houver algum problema na requisição
-                errorMessage?.let {
-                    Text(
-                        text = it,
-                        fontSize = 24.sp,
-                        color = Color.Red,
-                        modifier = Modifier.padding(10.dp)
-                    )
+            WeatherHeader() // Cabeçalho com informações principais do clima
+            WeatherAlerts() // Alertas climáticos
+            DailyForecast()  // Previsão diária
+
+            Row( // Row para alinhar os botões horizontalmente
+                horizontalArrangement = Arrangement.SpaceAround,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Button(
+                    onClick = { navController.navigate("search") },
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.accent)
+                ) {
+                    Text(text = "Buscar por Localização", color = AppColors.textColorSecondary)
                 }
-                // Exibe os dados se a resposta for bem-sucedida
-                weatherData?.let { data ->
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.cloud), // Substitua com seu ícone de clima
-                            contentDescription = "Weather Icon",
-                            modifier = Modifier.size(256.dp).padding(25.dp)
-                        )
 
-                        Text(
-                            text = data.name,
-                            fontSize = 48.sp,
-                            color = Color.White,
-                            modifier = Modifier.padding(10.dp)
-                        )
-
-                        Text(
-                            text = "${data.main.temp.toInt()}ºC",
-                            fontSize = 36.sp,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 10.dp)
-                        )
-
-                        Text(
-                            text = "———————————",
-                            fontSize = 32.sp,
-                            color = Color.White
-                        )
-
-                        // Exibindo dados adicionais como vento e umidade
-                        Row(
-                            modifier = Modifier.padding(5.dp),
-                            horizontalArrangement = Arrangement.spacedBy(20.dp)
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Image(
-                                    painter = painterResource(R.drawable.windy), // Substitua com ícone de vento
-                                    contentDescription = "Windy Icon",
-                                    modifier = Modifier.size(32.dp),
-                                    colorFilter = ColorFilter.tint(Color.White)
-                                )
-
-                                Text(
-                                    text = "Vento",
-                                    fontSize = 24.sp,
-                                    color = Color.White
-                                )
-
-                                Text(
-                                    text = "${data.wind.speed.toInt()} km/h",
-                                    fontSize = 16.sp,
-                                    color = Color.White
-                                )
-                            }
-
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Image(
-                                    painter = painterResource(R.drawable.umidity), // Substitua com ícone de umidade
-                                    contentDescription = "Umidity Icon",
-                                    modifier = Modifier.size(32.dp),
-                                    colorFilter = ColorFilter.tint(Color.White)
-                                )
-
-                                Text(
-                                    text = "Umidade",
-                                    fontSize = 24.sp,
-                                    color = Color.White
-                                )
-
-                                Text(
-                                    text = "${data.main.humidity}%",
-                                    fontSize = 16.sp,
-                                    color = Color.White
-                                )
-                            }
-                        }
-
-                        // Adicionando cartões de previsão
-                        Column(verticalArrangement = Arrangement.SpaceEvenly) {
-                            Card(modifier = Modifier.padding(20.dp)) {
-                                Text(
-                                    text = "Predomínio de chuva na parte da tarde",
-                                    fontSize = 26.sp,
-                                    modifier = Modifier.padding(15.dp)
-                                )
-                            }
-
-                            Card(modifier = Modifier.padding(20.dp)) {
-                                Text(
-                                    text = "Possibilidade de chuva e deslizamentos!",
-                                    fontSize = 26.sp,
-                                    modifier = Modifier.padding(25.dp)
-                                )
-                            }
-
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .fillMaxHeight()
-                                    .padding(20.dp),
-                                shape = RoundedCornerShape(32.dp)
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(8.dp)
-                                ) {
-                                    Column(horizontalAlignment = Alignment.Start) {
-                                        WeatherText("Hoje")
-                                        WeatherText("Amanhã")
-                                        WeatherText("Hoje")
-                                        WeatherText("Hoje")
-                                        WeatherText("Hoje")
-                                    }
-
-                                    Column(horizontalAlignment = Alignment.Start) {
-                                        Image(
-                                            painter = painterResource(R.drawable.cloud),
-                                            contentDescription = "Rain Icon",
-                                            Modifier.size(64.dp).padding(8.dp)
-                                        )
-                                        Image(
-                                            painter = painterResource(R.drawable.cloud),
-                                            contentDescription = "Rain Icon",
-                                            Modifier.size(64.dp).padding(start = 8.dp, end = 8.dp)
-                                        )
-                                        Image(
-                                            painter = painterResource(R.drawable.cloud),
-                                            contentDescription = "Rain Icon",
-                                            Modifier.size(64.dp).padding(start = 8.dp, end = 8.dp)
-                                        )
-                                        Image(
-                                            painter = painterResource(R.drawable.cloud),
-                                            contentDescription = "Rain Icon",
-                                            Modifier.size(64.dp).padding(start = 8.dp, end = 8.dp)
-                                        )
-                                        Image(
-                                            painter = painterResource(R.drawable.cloud),
-                                            contentDescription = "Rain Icon",
-                                            Modifier.size(64.dp).padding(start = 8.dp, end = 8.dp)
-                                        )
-                                    }
-
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        WeatherText("32ºC")
-                                        WeatherText("32ºC")
-                                        WeatherText("32ºC")
-                                        WeatherText("32ºC")
-                                        WeatherText("32ºC")
-                                    }
-
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        WeatherText("29ºC")
-                                        WeatherText("29ºC")
-                                        WeatherText("29ºC")
-                                        WeatherText("29ºC")
-                                        WeatherText("29ºC")
-                                    }
-                                }
-                            }
-                        }
-                    }
+                Button(
+                    onClick = {
+                        val intent = android.content.Intent(context, com.example.weatherguardian.screens.ConfigScreen::class.java)
+                        context.startActivity(intent)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.accent)
+                ) {
+                    Text(text = "Configurações", color = AppColors.textColorSecondary)
                 }
             }
         }
@@ -259,19 +78,143 @@ fun HomeScreen() {
 }
 
 @Composable
-fun WeatherText(text: String) {
-    Text(
-        modifier = Modifier.padding(15.dp),
-        text = text,
-        fontSize = 20.sp,
-        color = Color.Black,
-        fontWeight = FontWeight.Bold
-    )
+fun WeatherHeader() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Image(
+            painter = painterResource(R.drawable.cloud), // Ícone do clima (ex: nuvem)
+            contentDescription = "Weather Icon",
+            modifier = Modifier.size(192.dp),
+            colorFilter = ColorFilter.tint(AppColors.textColorPrimary) // Cor do ícone
+        )
+
+        Text(
+            text = "São Paulo",
+            fontSize = 36.sp,
+            color = AppColors.textColorPrimary,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            text = "32°C",
+            fontSize = 48.sp,
+            color = AppColors.textColorPrimary,
+            fontWeight = FontWeight.Bold
+        )
+
+        // Indicador visual para separar as informações
+        Divider(
+            color = AppColors.textColorPrimary,
+            thickness = 1.dp,
+            modifier = Modifier.width(80.dp)
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            WeatherDataItem(icon = R.drawable.windy, label = "Vento", value = "24 km/h")
+            WeatherDataItem(icon = R.drawable.umidity, label = "Umidade", value = "87%")
+        }
+    }
 }
 
-
-@Preview(showSystemUi = true)
 @Composable
-private fun HomeScreenPreview() {
-    HomeScreen()
+fun WeatherDataItem(icon: Int, label: String, value: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(icon),
+                contentDescription = label,
+                modifier = Modifier.size(24.dp),
+                colorFilter = ColorFilter.tint(AppColors.textColorPrimary)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = label,
+                fontSize = 20.sp,
+                color = AppColors.textColorPrimary
+            )
+        }
+        Text(
+            text = value,
+            fontSize = 14.sp,
+            color = AppColors.textColorPrimary
+        )
+    }
+}
+
+@Composable
+fun WeatherAlerts() {
+    Column {
+        AlertCard(text = "Predomínio de chuva na parte da tarde")
+        AlertCard(text = "Possibilidade de chuva e deslizamentos!")
+    }
+}
+
+@Composable
+fun AlertCard(text: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = AppColors.cardBackgroundLight)
+    ) {
+        Text(
+            text = text,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(16.dp),
+            textAlign = TextAlign.Center,
+            color = AppColors.textColorSecondary
+        )
+    }
+}
+
+@Composable
+fun DailyForecast() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = AppColors.cardBackgroundLight)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "Previsão para os próximos dias",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = AppColors.textColorSecondary,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            ForecastRow(day = "Hoje", icon = R.drawable.cloud, maxTemp = "32°C", minTemp = "29°C")
+            ForecastRow(day = "Amanhã", icon = R.drawable.rain, maxTemp = "28°C", minTemp = "25°C")
+            // Adicione mais linhas de previsão aqui
+        }
+    }
+}
+
+@Composable
+fun ForecastRow(day: String, icon: Int, maxTemp: String, minTemp: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text(text = day, fontSize = 16.sp, color = AppColors.textColorSecondary)
+        Image(
+            painter = painterResource(icon),
+            contentDescription = "Weather Icon",
+            modifier = Modifier.size(32.dp)
+        )
+        Text(text = maxTemp, fontSize = 16.sp, color = AppColors.textColorSecondary)
+        Text(text = minTemp, fontSize = 16.sp, color = AppColors.textColorSecondary)
+    }
 }
